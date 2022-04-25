@@ -57,6 +57,7 @@ public class Airkit {
     @Test
     public void basicTest() throws InterruptedException, IOException {
         String spanText;
+        driver.get("http://localhost:8000/");
         System.out.println("Loading Url");
         driver.get("https://app.airkit.com/u/2q5Cg2pt088IeM9AWZbet?");
         // explicit wait - to wait for the compose button to be click-able
