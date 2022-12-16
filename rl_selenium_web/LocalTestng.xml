@@ -1,0 +1,21 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite thread-count="1" name="SeleniumGridDocker" parallel="tests">
+
+    <listeners>
+        <listener class-name="com.resumelibrary.cucumber.CustomListener"/>
+    </listeners>
+
+    <test name="Test1">
+        <parameter name="machine" value="Local"/>
+        <!--        <parameter name="browser" value="remoteChromeBrowser"/>-->
+        <parameter name="browser" value="lambdaTestSafari"/>
+        <!--        <parameter name="browser" value="lambdaMobileWebChrome"/>-->
+        <!--        <parameter name="browser" value="remoteFirefoxBrowser"/>-->
+        <!--        <parameter name="browser" value="firefox"/>-->
+
+        <classes>
+            <class name="com.resumelibrary.cucumber.CucumberTestRunner"/>
+        </classes>
+    </test>
+</suite>

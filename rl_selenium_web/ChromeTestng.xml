@@ -1,0 +1,28 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite thread-count="14" name="SeleniumGridDocker" parallel="tests">
+
+    <listeners>
+        <listener class-name="com.resumelibrary.cucumber.CustomListener"/>
+    </listeners>
+
+    <test name="Chrome Test1">
+        <parameter name="machine" value="STAGING_MACHINE_1"/>
+        <parameter name="browser" value="lambdaTestChrome"/>
+        <!--        <parameter name="machine" value="STAGING_MACHINE_2"/>-->
+        <classes>
+            <class name="com.resumelibrary.cucumber.CucumberTestRunner"/>
+        </classes>
+    </test>
+
+<!--    <test name="Chrome Test2">-->
+<!--        <parameter name="machine" value="STAGING_MACHINE_1"/>-->
+<!--        <parameter name="browser" value="lambdaTestChrome"/>-->
+<!--        &lt;!&ndash;  <parameter name="machine" value="STAGING_MACHINE_2"/>&ndash;&gt;-->
+<!--        <classes>-->
+<!--            <class name="com.resumelibrary.cucumber.CucumberTestRunner2"/>-->
+<!--        </classes>-->
+<!--    </test>-->
+
+
+</suite>

@@ -1,0 +1,7 @@
+#surefire_0
+#Fri Dec 16 21:42:25 IST 2022
+Tag1=@Regression
+basedir=/Users/saurabh./Airkit_Customer/rl_selenium_web
+surefire.suiteXmlFiles=ChromeTestng.xml
+user.dir=/Users/saurabh./Airkit_Customer/rl_selenium_web
+localRepository=/Users/saurabh./.m2/repository

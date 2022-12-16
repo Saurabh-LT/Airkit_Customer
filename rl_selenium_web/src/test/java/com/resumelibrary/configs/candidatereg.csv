@@ -1,0 +1,9 @@
+home_town,zip_code,acceptable_job_types,education_level,work_experience,relocate,driving_license,eligibility_status
+"New York, NY","10001",Permanent,HighSchool,"0-1","1","0","unknown"
+"Boston, MA","02108",Contract,College,"1-2","0","1","auth_any_employer"
+"Los Angeles, CA","90001",Temp,Certification,"3-5","1","0","auth_present_employer"
+"Miami, FL","33109",Part Time,Vocational,"6-10","0","1","req_sponsorship"
+"Richmond, VA","23219",Permanent,Associates,"10+","1","0","auth_any_employer"
+"Detroit, MI","48201",Contract,Bachelors,"6-10","0","1","auth_present_employer"
+"Atlanta, GA","30303",Temp,Masters,"10+","1","0","req_sponsorship"
+"Baltimore, MD","21204",Part Time,Doctorate,"10+","0","1","req_sponsorship"
