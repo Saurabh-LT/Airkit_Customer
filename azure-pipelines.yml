@@ -62,3 +62,11 @@ steps:
         targetPath: target/surefire-reports
         artifact: test-reports
         publishLocation: pipeline
+
+    - task: configuration@1
+      inputs:
+          connection: 'Saurabh-Prod-Cred'
+          isTunnelActivate: false
+          isAppAutomate: false
+          isSmartUI: true
+    - task: LambdatestResults@1
