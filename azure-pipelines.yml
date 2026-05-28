@@ -37,12 +37,11 @@ steps:
         path: $(MAVEN_CACHE_FOLDER)
 
     - task: configuration@1
-      displayName: LambdaTest Configuration Setup
       inputs:
-        connection: 'Saurabh-Prod-Cred'
-        isTunnelActivate: false
-        isAppAutomate: false
-        isSmartUI: true
+          connection: 'Saurabh-Prod-Cred'
+          isTunnelActivate: false
+          isAppAutomate: false
+          isSmartUI: true
 
     - script: |
         mvn -B -e test \
@@ -73,5 +72,3 @@ steps:
         publishLocation: pipeline
 
     - task: LambdatestResults@1
-      displayName: LambdaTest Test Results
-      condition: succeededOrFailed()
