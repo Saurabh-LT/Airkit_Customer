@@ -1,64 +1,90 @@
 trigger:
-  branches:
-    include:
-      - main
+    branches:
+      include:
+        - main
 
 pool:
-  vmImage: ubuntu-latest
+    vmImage: ubuntu-latest
 
 parameters:
-  - name: suiteXmlFile
-    displayName: TestNG suite to run
-    type: string
-    default: LT_TestNG.xml
-    values:
-      - LT_TestNG.xml
-      - TestNG.xml
+    - name: suiteXmlFile
+      displayName: TestNG suite to run
+      type: string
+      default: LT_TestNG.xml
+      values:
+        - LT_TestNG.xml
+        - TestNG.xml
 
 variables:
-  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
-  MAVEN_OPTS: -Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)
+    MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+    MAVEN_OPTS: -Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)
+    LT_TUNNEL_NAME: azure-$(Build.BuildId)
 
 steps:
-  - task: JavaToolInstaller@0
-    displayName: Set Java Version
-    inputs:
-      versionSpec: "8"
-      jdkArchitectureOption: x64
-      jdkSourceOption: PreInstalled
+    - task: JavaToolInstaller@0
+      displayName: Set Java Version
+      inputs:
+        versionSpec: "8"
+        jdkArchitectureOption: x64
+        jdkSourceOption: PreInstalled
 
-  - task: Cache@2
-    displayName: Cache Maven dependencies
-    inputs:
-      key: 'maven | "$(Agent.OS)" | pom.xml'
-      restoreKeys: |
-        maven | "$(Agent.OS)"
-        maven
-      path: $(MAVEN_CACHE_FOLDER)
+    - task: Cache@2
+      displayName: Cache Maven dependencies
+      inputs:
+        key: 'maven | "$(Agent.OS)" | pom.xml'
+        restoreKeys: |
+          maven | "$(Agent.OS)"
+          maven
+        path: $(MAVEN_CACHE_FOLDER)
 
-  - script: |
-      mvn -B -e test \
-        -DsuiteXmlFile=${{ parameters.suiteXmlFile }} \
-        -DLT_USER_NAME="$LT_USERNAME" \
-        -DLT_ACCESS_KEY="$LT_ACCESS_KEY" \
-        -DBUILD_NAME="Azure-$(Build.BuildNumber)"
-    displayName: Run TestNG Suite
-    env:
-      LT_USERNAME: $(LT_USERNAME)
-      LT_ACCESS_KEY: $(LT_ACCESS_KEY)
+    # ---- LambdaTest: configure creds + start tunnel ----
+    - task: LambdaTestConfigSetup@1
+      displayName: LambdaTest Configuration Setup
+      inputs:
+        lambdatestCredsInputType: serviceConnection
+        lambdatestServiceEndpoint: lambdatest-creds
+        tunnel: true
+        tunnelName: $(LT_TUNNEL_NAME)
 
-  - task: PublishTestResults@2
-    displayName: Publish TestNG Results
-    condition: succeededOrFailed()
-    inputs:
-      testResultsFormat: JUnit
-      testResultsFiles: "**/surefire-reports/TEST-*.xml"
-      testRunTitle: LambdaTest Results
+    # ---- Run the TestNG suite against LambdaTest hub ----
+    - script: |
+        mvn -B -e test \
+          -DsuiteXmlFile=${{ parameters.suiteXmlFile }} \
+          -DLT_USER_NAME="$LT_USERNAME" \
+          -DLT_ACCESS_KEY="$LT_ACCESS_KEY" \
+          -DBUILD_NAME="Azure-$(Build.BuildNumber)" \
+          -DLT_TUNNEL_NAME="$(LT_TUNNEL_NAME)"
+      displayName: Run TestNG Suite
+      env:
+        LT_USERNAME: $(LT_USERNAME)
+        LT_ACCESS_KEY: $(LT_ACCESS_KEY)
 
-  - task: PublishPipelineArtifact@1
-    displayName: Publish Surefire Reports
-    condition: succeededOrFailed()
-    inputs:
-      targetPath: target/surefire-reports
-      artifact: test-reports
-      publishLocation: pipeline
+    # ---- Publish JUnit results to Azure Test tab ----
+    - task: PublishTestResults@2
+      displayName: Publish TestNG Results (JUnit)
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFormat: JUnit
+        testResultsFiles: "**/surefire-reports/TEST-*.xml"
+        testRunTitle: LambdaTest Results
+
+    # ---- LambdaTest: surface session links / TestMu AI summary ----
+    - task: LambdaTestResults@1
+      displayName: LambdaTest Test Results
+      condition: succeededOrFailed()
+
+    # ---- LambdaTest: stop tunnel (always run) ----
+    - task: LambdaTestStopTunnel@1
+      displayName: LambdaTest Stop Tunnel
+      condition: always()
+      inputs:
+        tunnelName: $(LT_TUNNEL_NAME)
+
+    # ---- Upload raw surefire reports as a pipeline artifact ----
+    - task: PublishPipelineArtifact@1
+      displayName: Publish Surefire Reports
+      condition: succeededOrFailed()
+      inputs:
+        targetPath: target/surefire-reports
+        artifact: test-reports
+        publishLocation: pipeline
