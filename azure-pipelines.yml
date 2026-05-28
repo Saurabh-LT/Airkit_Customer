@@ -36,12 +36,21 @@ steps:
           maven
         path: $(MAVEN_CACHE_FOLDER)
 
+    - task: configuration@1
+      displayName: LambdaTest Configuration Setup
+      inputs:
+        connection: 'Saurabh-Prod-Cred'
+        isTunnelActivate: false
+        isAppAutomate: false
+        isSmartUI: true
+
     - script: |
         mvn -B -e test \
           -DsuiteXmlFile=${{ parameters.suiteXmlFile }} \
           -DLT_USER_NAME="$LT_USERNAME" \
           -DLT_ACCESS_KEY="$LT_ACCESS_KEY" \
-          -DBUILD_NAME="Azure-$(Build.BuildNumber)"
+          -DBUILD_NAME="Azure-$(Build.BuildNumber)" \
+          -DSMARTUI_PROJECT="running from Azure"
       displayName: Run TestNG Suite
       env:
         LT_USERNAME: $(LT_USERNAME)
@@ -63,10 +72,6 @@ steps:
         artifact: test-reports
         publishLocation: pipeline
 
-    - task: configuration@1
-      inputs:
-          connection: 'Saurabh-Prod-Cred'
-          isTunnelActivate: false
-          isAppAutomate: false
-          isSmartUI: true
     - task: LambdatestResults@1
+      displayName: LambdaTest Test Results
+      condition: succeededOrFailed()

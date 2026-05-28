@@ -32,7 +32,13 @@ public class JenkinsDemo {
         caps.setCapability("build", buildName);
         caps.setCapability("name", m.getName() + this.getClass().getName());
         caps.setCapability("plugin", "git-testng");
-        caps.setCapability("visual",true);
+        caps.setCapability("visual", true);
+
+        // SmartUI visual regression (https://www.testmuai.com/support/docs/selenium-visual-regression/)
+        caps.setCapability("smartUI.project", System.getProperty("SMARTUI_PROJECT", "Airkit_Customer"));
+        caps.setCapability("smartUI.build", buildName);
+        caps.setCapability("smartUI.baseline", Boolean.parseBoolean(System.getProperty("SMARTUI_BASELINE", "false")));
+
         // To view performance metrics
         String[] Tags = new String[] { "Feature", "Magicleap", "Severe" };
         caps.setCapability("tags", Tags);
@@ -56,6 +62,7 @@ public class JenkinsDemo {
 
         for (int i = 0; i < urls.length; i++) {
             String url = urls[i];
+            String screenshotName = "page-" + (i + 1) + "-" + url.replaceAll("https?://", "").replaceAll("[^a-zA-Z0-9]+", "_");
             System.out.println("Opening (" + (i + 1) + "/" + urls.length + "): " + url);
             driver.executeScript("lambda-name=" + url);
             try {
@@ -66,13 +73,15 @@ public class JenkinsDemo {
                 if (title == null) {
                     throw new AssertionError("Page did not load — title was null for " + url);
                 }
+                Thread.sleep(2000);
+                System.out.println("  -> SmartUI screenshot: " + screenshotName);
+                driver.executeScript("smartui.takeScreenshot=" + screenshotName);
             } catch (Throwable t) {
                 System.out.println("  -> FAILED on " + url + ": " + t.getMessage());
                 Status = "failed";
                 driver.executeScript("lambda-status=failed");
                 throw t;
             }
-            Thread.sleep(2000);
         }
 
         System.out.println("All URLs opened successfully.");
