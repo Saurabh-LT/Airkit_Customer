@@ -46,14 +46,14 @@ steps:
     - script: |
         mvn -B -e test \
           -DsuiteXmlFile=${{ parameters.suiteXmlFile }} \
-          -DLT_USER_NAME="$LT_USERNAME" \
-          -DLT_ACCESS_KEY="$LT_ACCESS_KEY" \
+          -DLT_USER_NAME="saurabhlambdatest"
+          -DLT_ACCESS_KEY="LT_DH7GiWsCwSpBLO6Z3ROJVRdL5PMZ3jhWvtDToKApcvbDPes"
           -DBUILD_NAME="Azure-$(Build.BuildNumber)" \
           -DSMARTUI_PROJECT="running from Azure"
       displayName: Run TestNG Suite
       env:
-        LT_USERNAME: $(LT_USERNAME)
-        LT_ACCESS_KEY: $(LT_ACCESS_KEY)
+        LT_USERNAME: "saurabhlambdatest"
+        LT_ACCESS_KEY: "LT_DH7GiWsCwSpBLO6Z3ROJVRdL5PMZ3jhWvtDToKApcvbDPes"
 
     - task: PublishTestResults@2
       displayName: Publish TestNG Results
