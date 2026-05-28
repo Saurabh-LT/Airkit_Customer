@@ -1,0 +1,59 @@
+  trigger:
+    - main
+
+  pool:
+    vmImage: 'ubuntu-latest'
+
+  parameters:
+    - name: suiteXmlFile
+      displayName: 'TestNG suite to run'
+      type: string
+      default: 'LT_TestNG.xml'
+      values:
+        - 'LT_TestNG.xml'
+        - 'TestNG.xml'
+
+  variables:
+    MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+    MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+
+  steps:
+    - task: JavaToolInstaller@0
+      displayName: 'Set Java Version'
+      inputs:
+        versionSpec: '8'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'PreInstalled'
+
+    - task: Cache@2
+      displayName: 'Cache Maven dependencies'
+      inputs:
+        key: 'maven | "$(Agent.OS)" | pom.xml'
+        restoreKeys: |
+          maven | "$(Agent.OS)"
+          maven
+        path: $(MAVEN_CACHE_FOLDER)
+
+    - script: |
+        mvn -B -e test -DsuiteXmlFile=${{ parameters.suiteXmlFile }}
+      displayName: 'Run TestNG Suite (${{ parameters.suiteXmlFile }})'
+      env:
+        # These must match the EXACT names in your Pipeline Variables UI
+        LT_USERNAME: $(LT_USERNAME)
+        LT_ACCESS_KEY: $(LT_ACCESS_KEY)
+
+    - task: PublishTestResults@2
+      displayName: 'Publish TestNG Results'
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        testRunTitle: 'LambdaTest Results'
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Surefire Reports'
+      condition: succeededOrFailed()
+      inputs:
+        targetPath: 'target/surefire-reports'
+        artifact: 'test-reports'
+        publishLocation: 'pipeline'
