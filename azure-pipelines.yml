@@ -1,4 +1,4 @@
-  trigger:
+trigger:
     - main
 
   pool:
@@ -35,7 +35,11 @@
         path: $(MAVEN_CACHE_FOLDER)
 
     - script: |
-        mvn -B -e test -DsuiteXmlFile=${{ parameters.suiteXmlFile }}
+        mvn -B -e test \
+          -DsuiteXmlFile=${{ parameters.suiteXmlFile }} \
+          -DLT_USER_NAME="$LT_USERNAME" \
+          -DLT_ACCESS_KEY="$LT_ACCESS_KEY" \
+          -DBUILD_NAME="Azure-$(Build.BuildNumber)"
       displayName: 'Run TestNG Suite (${{ parameters.suiteXmlFile }})'
       env:
         # These must match the EXACT names in your Pipeline Variables UI
