@@ -46,16 +46,36 @@ public class JenkinsDemo {
     }
 
     @Test
-    public void basicTest() {
-        System.out.println("Loading LambdaTest Website");
-        driver.get("https://www.lambdatest.com/");
-        wait(driver, By.cssSelector("a[href*='/login']"), 30);
-        driver.findElement(By.cssSelector("a[href*='/login']")).click();
-        wait(driver, By.id("email"), 30);
-        driver.findElement(By.id("email")).sendKeys("Enter you email");
-        driver.findElement(By.id("password")).sendKeys("Enter you password");
-        driver.findElement(By.id("login-button")).click();
-        System.out.println("Test Executed successfully.");
+    public void basicTest() throws InterruptedException {
+        String[] urls = new String[] {
+                "https://ltqa-frontend.lambdatestinternal.com/dynamic-colour-testing",
+                "https://ltqa-frontend.lambdatestinternal.com/cross-browser-testing",
+                "https://ltqa-frontend.lambdatestinternal.com/dynamic-data-testing",
+                "https://ltqa-frontend.lambdatestinternal.com/"
+        };
+
+        for (int i = 0; i < urls.length; i++) {
+            String url = urls[i];
+            System.out.println("Opening (" + (i + 1) + "/" + urls.length + "): " + url);
+            driver.executeScript("lambda-name=" + url);
+            try {
+                driver.get(url);
+                wait(driver, By.tagName("body"), 30);
+                String title = driver.getTitle();
+                System.out.println("  -> Title: " + title + " | URL: " + driver.getCurrentUrl());
+                if (title == null) {
+                    throw new AssertionError("Page did not load — title was null for " + url);
+                }
+            } catch (Throwable t) {
+                System.out.println("  -> FAILED on " + url + ": " + t.getMessage());
+                Status = "failed";
+                driver.executeScript("lambda-status=failed");
+                throw t;
+            }
+            Thread.sleep(2000);
+        }
+
+        System.out.println("All URLs opened successfully.");
         Status = "passed";
     }
 
