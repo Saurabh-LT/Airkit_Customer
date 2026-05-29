@@ -42,7 +42,7 @@ steps:
             connection: 'Saurabh-Prod-Cred'
             isTunnelActivate: false
             isAppAutomate: true
-            isSmartUI: true
+            isSmartUI: false
 
       - script: |
           echo "===== DEBUG (no secrets leaked) ====="
