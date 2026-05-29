@@ -18,6 +18,7 @@ parameters:
 variables:
       MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
       MAVEN_OPTS: -Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)
+      APP_URL: lt://APP10160362031780051969941430
 
 steps:
       - task: JavaToolInstaller@0
@@ -42,25 +43,6 @@ steps:
             isTunnelActivate: false
             isAppAutomate: true
             isSmartUI: true
-
-      - script: |
-          echo "Uploading proverbial.apk to LambdaTest..."
-          UPLOAD=$(curl -sS -u "$LT_USERNAME:$LT_ACCESS_KEY" \
-            -X POST "https://manual-api.lambdatest.com/app/upload/realDevice" \
-            -F "appFile=@proverbial.apk" \
-            -F "name=ProverbialApp-$(Build.BuildNumber)")
-          echo "Upload response: $UPLOAD"
-          APP_URL=$(echo "$UPLOAD" | grep -o 'lt://APP[A-Z0-9]*' | head -n1)
-          if [ -z "$APP_URL" ]; then
-            echo "##vso[task.logissue type=error]Could not extract app_url from upload response"
-            exit 1
-          fi
-          echo "##vso[task.setvariable variable=APP_URL]$APP_URL"
-          echo "Uploaded → $APP_URL"
-        displayName: Upload APK to LambdaTest
-        env:
-          LT_USERNAME: $(LT_USERNAME)
-          LT_ACCESS_KEY: $(LT_ACCESS_KEY)
 
       - script: |
           echo "===== DEBUG (no secrets leaked) ====="
