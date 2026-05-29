@@ -25,6 +25,13 @@ public class JenkinsDemo {
         String LT_ACCESS_KEY = System.getProperty("LT_ACCESS_KEY", "");
         String buildName = System.getProperty("BUILD_NAME");
         String hub = "@hub.lambdatest.com/wd/hub";
+
+        // Debug — log lengths and the redacted grid URL so we can diagnose Azure auth issues
+        String maskedKey = LT_ACCESS_KEY.isEmpty() ? "(empty)"
+                : LT_ACCESS_KEY.substring(0, Math.min(5, LT_ACCESS_KEY.length())) + "***";
+        System.out.println("[DEBUG] LT_USER_NAME='" + LT_USER_NAME + "' length=" + LT_USER_NAME.length());
+        System.out.println("[DEBUG] LT_ACCESS_KEY length=" + LT_ACCESS_KEY.length() + " preview=" + maskedKey);
+        System.out.println("[DEBUG] Grid URL = https://" + LT_USER_NAME + ":" + maskedKey + hub);
         DesiredCapabilities caps = new DesiredCapabilities();
         caps.setCapability("platform", "MacOS Monterey");
         caps.setCapability("browserName", "Safari");

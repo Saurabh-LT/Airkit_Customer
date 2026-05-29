@@ -44,6 +44,12 @@ steps:
             isSmartUI: true
 
       - script: |
+          echo "===== DEBUG CREDS (safe — only lengths + first chars) ====="
+          echo "LT_USERNAME    length=${#LT_USERNAME}   first3='${LT_USERNAME:0:3}'   last2='${LT_USERNAME: -2}'"
+          echo "LT_ACCESS_KEY  length=${#LT_ACCESS_KEY} first5='${LT_ACCESS_KEY:0:5}' last3='${LT_ACCESS_KEY: -3}'"
+          echo "Expected:      LT_USERNAME length=17 first3='sau' last2='st'"
+          echo "Expected:      LT_ACCESS_KEY length=50 first5='LT_oZ' last3='GBc'"
+          echo "==========================================================="
           mvn -B -e test \
             -DsuiteXmlFile=${{ parameters.suiteXmlFile }} \
             -DLT_USER_NAME="$LT_USERNAME" \
