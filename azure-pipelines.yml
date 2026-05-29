@@ -78,3 +78,9 @@ steps:
           publishLocation: pipeline
 
       - task: LambdatestResults@1
+
+      - task: configuration@1
+        inputs:
+            isTunnelActivate: false
+            isAppAutomate: true
+            isSmartUI: true
