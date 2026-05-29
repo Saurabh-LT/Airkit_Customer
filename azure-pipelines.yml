@@ -40,26 +40,46 @@ steps:
         inputs:
             connection: 'Saurabh-Prod-Cred'
             isTunnelActivate: false
-            isAppAutomate: false
+            isAppAutomate: true
             isSmartUI: true
 
       - script: |
-          echo "===== DEBUG CREDS (safe — only lengths + first chars) ====="
-          echo "LT_USERNAME    length=${#LT_USERNAME}   first3='${LT_USERNAME:0:3}'   last2='${LT_USERNAME: -2}'"
-          echo "LT_ACCESS_KEY  length=${#LT_ACCESS_KEY} first5='${LT_ACCESS_KEY:0:5}' last3='${LT_ACCESS_KEY: -3}'"
-          echo "Expected:      LT_USERNAME length=17 first3='sau' last2='st'"
-          echo "Expected:      LT_ACCESS_KEY length=50 first5='LT_oZ' last3='GBc'"
-          echo "==========================================================="
+          echo "Uploading proverbial.apk to LambdaTest..."
+          UPLOAD=$(curl -sS -u "$LT_USERNAME:$LT_ACCESS_KEY" \
+            -X POST "https://manual-api.lambdatest.com/app/upload/realDevice" \
+            -F "appFile=@proverbial.apk" \
+            -F "name=ProverbialApp-$(Build.BuildNumber)")
+          echo "Upload response: $UPLOAD"
+          APP_URL=$(echo "$UPLOAD" | grep -o 'lt://APP[A-Z0-9]*' | head -n1)
+          if [ -z "$APP_URL" ]; then
+            echo "##vso[task.logissue type=error]Could not extract app_url from upload response"
+            exit 1
+          fi
+          echo "##vso[task.setvariable variable=APP_URL]$APP_URL"
+          echo "Uploaded → $APP_URL"
+        displayName: Upload APK to LambdaTest
+        env:
+          LT_USERNAME: $(LT_USERNAME)
+          LT_ACCESS_KEY: $(LT_ACCESS_KEY)
+
+      - script: |
+          echo "===== DEBUG (no secrets leaked) ====="
+          echo "LT_USERNAME    length=${#LT_USERNAME}   first3='${LT_USERNAME:0:3}'"
+          echo "LT_ACCESS_KEY  length=${#LT_ACCESS_KEY} first5='${LT_ACCESS_KEY:0:5}'"
+          echo "APP_URL        $APP_URL"
+          echo "====================================="
           mvn -B -e test \
             -DsuiteXmlFile=${{ parameters.suiteXmlFile }} \
             -DLT_USER_NAME="$LT_USERNAME" \
             -DLT_ACCESS_KEY="$LT_ACCESS_KEY" \
             -DBUILD_NAME="Azure-$(Build.BuildNumber)" \
-            -DSMARTUI_PROJECT="running from Azure"
+            -DSMARTUI_PROJECT="running from Azure" \
+            -DAPP_URL="$APP_URL"
         displayName: Run TestNG Suite
         env:
           LT_USERNAME: $(LT_USERNAME)
           LT_ACCESS_KEY: $(LT_ACCESS_KEY)
+          APP_URL: $(APP_URL)
 
       - task: PublishTestResults@2
         displayName: Publish TestNG Results

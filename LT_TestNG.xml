@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="All Test Suite">
-    <test verbose="2" name="/JenkinsDemo">
+<suite name="All Test Suite" verbose="2">
+    <test name="JenkinsDemo_OpenUrls">
         <classes>
             <class name="JenkinsDemo"/>
+        </classes>
+    </test>
+    <test name="App_Proverbial">
+        <classes>
+            <class name="AppAutomationTest"/>
         </classes>
     </test>
 </suite>
