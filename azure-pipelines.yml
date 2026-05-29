@@ -36,13 +36,6 @@ steps:
           maven
         path: $(MAVEN_CACHE_FOLDER)
 
-    - task: configuration@1
-      inputs:
-          connection: 'Saurabh-Prod-Cred'
-          isTunnelActivate: false
-          isAppAutomate: false
-          isSmartUI: true
-
     - script: |
         mvn -B -e test \
           -DsuiteXmlFile=${{ parameters.suiteXmlFile }} \
@@ -71,4 +64,4 @@ steps:
         artifact: test-reports
         publishLocation: pipeline
 
-    - task: LambdatestResults@1
+
