@@ -21,9 +21,9 @@ public class JenkinsDemo {
 
     @BeforeMethod
     public void setup(Method m, ITestContext ctx) throws MalformedURLException {
-        String LT_USER_NAME = System.getProperty("LT_USER_NAME", "");
-        String LT_ACCESS_KEY = System.getProperty("LT_ACCESS_KEY", "");
-        String buildName = System.getProperty("BUILD_NAME");
+        String LT_USER_NAME = System.getProperty("LT_USER_NAME", "").trim();
+        String LT_ACCESS_KEY = System.getProperty("LT_ACCESS_KEY", "").trim();
+        String buildName = System.getProperty("BUILD_NAME", "").trim();
         String hub = "@hub.lambdatest.com/wd/hub";
 
         // Debug — log lengths and the redacted grid URL so we can diagnose Azure auth issues
