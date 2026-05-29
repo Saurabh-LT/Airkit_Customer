@@ -40,13 +40,13 @@ steps:
         mvn -B -e test \
           -DsuiteXmlFile=${{ parameters.suiteXmlFile }} \
           -DLT_USER_NAME="saurabhlambdatest"
-          -DLT_ACCESS_KEY="LT_DH7GiWsCwSpBLO6Z3ROJVRdL5PMZ3jhWvtDToKApcvbDPes"
+          -DLT_ACCESS_KEY="LT_FaHywzUvoKicGTVyApvjzvWYN50U9VSBLUioXuEI5VnkRbW"
           -DBUILD_NAME="Azure-$(Build.BuildNumber)" \
           -DSMARTUI_PROJECT="running from Azure"
       displayName: Run TestNG Suite
       env:
         LT_USERNAME: "saurabhlambdatest"
-        LT_ACCESS_KEY: "LT_DH7GiWsCwSpBLO6Z3ROJVRdL5PMZ3jhWvtDToKApcvbDPes"
+        LT_ACCESS_KEY: "LT_FaHywzUvoKicGTVyApvjzvWYN50U9VSBLUioXuEI5VnkRbW"
 
     - task: PublishTestResults@2
       displayName: Publish TestNG Results
@@ -64,4 +64,12 @@ steps:
         artifact: test-reports
         publishLocation: pipeline
 
+    - task: LambdatestResults@1
+    
+    - task: configuration@1
+      inputs:
+        connection: 'Saurabh-Prod-Cred'
+        isTunnelActivate: false
+        isAppAutomate: true
+        isSmartUI: true
 
